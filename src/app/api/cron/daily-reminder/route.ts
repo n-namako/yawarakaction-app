@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     .from("app_users")
     .select("line_user_id")
     .eq("notify_enabled", true)
-    .contains("notify_times", [slot]);
+    .contains("notify_times", JSON.stringify([slot]));
 
   if (usersError) {
     console.error("app_usersの取得に失敗しました", usersError);
