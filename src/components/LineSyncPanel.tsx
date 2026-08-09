@@ -121,10 +121,10 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="LINEと連携">
+    <Modal isOpen={isOpen} onClose={onClose} title="データ保存・通知">
       <div className="flex flex-col gap-4">
         <p className="text-sm text-stone-400">
-          LINEでログインすると、記録やアクションのデータがブラウザのキャッシュを消しても消えなくなります。通知はLINEではなく、このブラウザ・端末に直接届く「プッシュ通知」でお知らせします。
+          LINEでログインすると、①記録やアクションのデータがブラウザのキャッシュを消しても消えなくなり、②この端末に「プッシュ通知」でリマインドを届けられるようになります。通知だけ使いたい場合も、まずこのログインが必要です（通知そのものはLINEではなく、ブラウザ標準のプッシュ通知でお届けします）。
         </p>
 
         {status === "authenticated" ? (

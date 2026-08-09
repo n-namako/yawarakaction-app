@@ -1,6 +1,7 @@
 "use client";
 
-import { Home, NotebookPen } from "lucide-react";
+import { ReactNode } from "react";
+import { NotebookPen } from "lucide-react";
 
 export type TabKey = "home" | "records";
 
@@ -9,15 +10,15 @@ interface TabNavProps {
   onChange: (tab: TabKey) => void;
 }
 
-const TABS: { key: TabKey; label: string; icon: typeof Home }[] = [
-  { key: "home", label: "きょうの一歩", icon: Home },
-  { key: "records", label: "きろく", icon: NotebookPen },
+const TABS: { key: TabKey; label: string; icon: ReactNode }[] = [
+  { key: "home", label: "きょうの一歩", icon: <span className="text-base leading-none">🐾</span> },
+  { key: "records", label: "きろく", icon: <NotebookPen size={16} /> },
 ];
 
 export default function TabNav({ active, onChange }: TabNavProps) {
   return (
     <nav className="mx-auto flex w-fit gap-1 rounded-full bg-white/70 p-1.5 shadow-sm ring-1 ring-black/5 backdrop-blur-sm">
-      {TABS.map(({ key, label, icon: Icon }) => {
+      {TABS.map(({ key, label, icon }) => {
         const isActive = key === active;
         return (
           <button
@@ -29,7 +30,7 @@ export default function TabNav({ active, onChange }: TabNavProps) {
                 : "text-stone-400 hover:bg-stone-100 hover:text-stone-600"
             }`}
           >
-            <Icon size={16} />
+            {icon}
             {label}
           </button>
         );

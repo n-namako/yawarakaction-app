@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { HeartHandshake, Link2 } from "lucide-react";
+import { Cloud, HeartHandshake } from "lucide-react";
 import TabNav, { TabKey } from "@/components/TabNav";
 import TaskCard from "@/components/TaskCard";
 import VideoPlayer from "@/components/VideoPlayer";
@@ -80,10 +80,10 @@ export default function Home() {
 
         <button
           onClick={() => setIsLineSyncOpen(true)}
-          className="flex items-center gap-1.5 text-stone-300 underline-offset-4 transition-colors hover:text-emerald-500 hover:underline"
+          className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-600 shadow-sm ring-1 ring-emerald-200/60 transition-all hover:-translate-y-0.5 hover:bg-emerald-100 hover:shadow-md active:translate-y-0"
         >
-          <Link2 size={14} />
-          LINEと連携する（データ保存・通知）
+          <Cloud size={16} />
+          データ保存・通知
         </button>
       </footer>
 
