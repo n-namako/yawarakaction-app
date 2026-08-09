@@ -31,6 +31,7 @@ export async function GET(request: Request) {
     .contains("notify_times", [slot]);
 
   if (usersError) {
+    console.error("app_usersの取得に失敗しました", usersError);
     return NextResponse.json({ error: usersError.message }, { status: 500 });
   }
 
@@ -45,6 +46,7 @@ export async function GET(request: Request) {
     .in("line_user_id", targetIds);
 
   if (subsError) {
+    console.error("push_subscriptionsの取得に失敗しました", subsError);
     return NextResponse.json({ error: subsError.message }, { status: 500 });
   }
 
