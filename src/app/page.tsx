@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Cloud, HeartHandshake } from "lucide-react";
 import TabNav, { TabKey } from "@/components/TabNav";
 import TaskCard from "@/components/TaskCard";
@@ -11,12 +11,22 @@ import WishListModal from "@/components/WishListModal";
 import LineSyncPanel from "@/components/LineSyncPanel";
 import CloudSyncManager from "@/components/CloudSyncManager";
 import { useLocalRecords } from "@/hooks/useLocalRecords";
+import { useTaskBoard } from "@/hooks/useTaskBoard";
+import { useEditableVideos } from "@/hooks/useEditableVideos";
+import { useVideoBoard } from "@/hooks/useVideoBoard";
 import { getRandomMilestonePraise, getRandomPraise } from "@/data/praises";
 import { isMilestoneCount } from "@/lib/milestones";
+import { RecordEntry, RecordSource } from "@/types";
 
 export default function Home() {
   const [tab, setTab] = useState<TabKey>("home");
   const { records, addRecord, clearRecords } = useLocalRecords();
+  const { selectTask } = useTaskBoard();
+  const { videos } = useEditableVideos();
+  const { selectVideoById } = useVideoBoard(videos);
+  const [repeatNotice, setRepeatNotice] = useState<string | null>(null);
+  const [scrollToVideoSignal, setScrollToVideoSignal] = useState(0);
+  const videoSectionRef = useRef<HTMLDivElement>(null);
 
   const [isPraiseOpen, setIsPraiseOpen] = useState(false);
   const [praiseMessage, setPraiseMessage] = useState("");
@@ -38,16 +48,45 @@ export default function Home() {
     }
   }, []);
 
-  function handleComplete(taskName: string) {
+  function handleComplete(taskName: string, source?: RecordSource) {
     const newCount = records.length + 1;
     const milestone = isMilestoneCount(newCount);
 
-    addRecord(taskName);
+    addRecord(taskName, source);
     setCompletedTaskName(taskName);
     setPraiseMessage(milestone ? getRandomMilestonePraise() : getRandomPraise());
     setMilestoneCount(milestone ? newCount : null);
     setIsPraiseOpen(true);
   }
+
+  // きろく画面の記録から、そのアクション/動画をもう一度表示する
+  function handleRepeat(entry: RecordEntry) {
+    if (!entry.source) return;
+    const ok =
+      entry.source.type === "task"
+        ? selectTask(entry.source.id)
+        : selectVideoById(entry.source.id);
+    if (!ok) {
+      setRepeatNotice("そのアクションは編集で消えているみたいです");
+      return;
+    }
+    setTab("home");
+    if (entry.source.type === "video") {
+      setScrollToVideoSignal((n) => n + 1);
+    }
+  }
+
+  useEffect(() => {
+    if (!repeatNotice) return;
+    const timer = setTimeout(() => setRepeatNotice(null), 3000);
+    return () => clearTimeout(timer);
+  }, [repeatNotice]);
+
+  // 動画をもう一度表示するタイミングで、動画のところまで自動スクロールする
+  useEffect(() => {
+    if (scrollToVideoSignal === 0) return;
+    videoSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [scrollToVideoSignal]);
 
   return (
     <div className="flex flex-1 flex-col items-center px-4 py-10 sm:py-16">
@@ -71,10 +110,12 @@ export default function Home() {
         {tab === "home" ? (
           <div className="flex flex-col gap-6">
             <TaskCard onComplete={handleComplete} />
-            <VideoPlayer onComplete={handleComplete} />
+            <div ref={videoSectionRef}>
+              <VideoPlayer onComplete={handleComplete} />
+            </div>
           </div>
         ) : (
-          <RecordTimeline records={records} onClear={clearRecords} />
+          <RecordTimeline records={records} onClear={clearRecords} onRepeat={handleRepeat} />
         )}
       </main>
 
@@ -124,6 +165,14 @@ export default function Home() {
       />
 
       <CloudSyncManager />
+
+      {repeatNotice && (
+        <div className="fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
+          <p className="rounded-full bg-stone-800/90 px-4 py-2 text-sm font-bold text-white shadow-lg">
+            {repeatNotice}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -108,5 +108,13 @@ export function useTaskBoard() {
     applyTasks(ACTION_TASKS, ACTION_TASKS[0]?.id ?? null);
   }, []);
 
-  return { tasks, currentTask, shuffle, addTask, updateTask, removeTask, resetTasks };
+  // きろく画面の「もう一度やる」から、特定のアクションを表示中にする。存在しなければfalseを返す
+  const selectTask = useCallback((id: string): boolean => {
+    if (!state.tasks.some((t) => t.id === id)) return false;
+    state = { ...state, currentTaskId: id };
+    emitChange();
+    return true;
+  }, []);
+
+  return { tasks, currentTask, shuffle, addTask, updateTask, removeTask, resetTasks, selectTask };
 }

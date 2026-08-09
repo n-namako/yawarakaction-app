@@ -6,9 +6,10 @@ import { useTaskBoard } from "@/hooks/useTaskBoard";
 import TaskListEditor from "@/components/TaskListEditor";
 import TaskTimer from "@/components/TaskTimer";
 import { parseDurationToSeconds } from "@/lib/duration";
+import { RecordSource } from "@/types";
 
 interface TaskCardProps {
-  onComplete: (taskName: string) => void;
+  onComplete: (taskName: string, source?: RecordSource) => void;
 }
 
 export default function TaskCard({ onComplete }: TaskCardProps) {
@@ -18,7 +19,7 @@ export default function TaskCard({ onComplete }: TaskCardProps) {
 
   function handleComplete() {
     if (!currentTask) return;
-    onComplete(`${currentTask.title}（${currentTask.duration}）`);
+    onComplete(`${currentTask.title}（${currentTask.duration}）`, { type: "task", id: currentTask.id });
     shuffle();
   }
 

@@ -8,6 +8,7 @@ import { RecordEntry } from "@/types";
 interface RecordTimelineProps {
   records: RecordEntry[];
   onClear: () => void;
+  onRepeat: (entry: RecordEntry) => void;
 }
 
 function formatDateLabel(dateStr: string): string {
@@ -37,7 +38,7 @@ function formatTime(dateStr: string): string {
   });
 }
 
-export default function RecordTimeline({ records, onClear }: RecordTimelineProps) {
+export default function RecordTimeline({ records, onClear, onRepeat }: RecordTimelineProps) {
   const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
 
   const groups = records.reduce<Record<string, RecordEntry[]>>((acc, record) => {
@@ -85,7 +86,16 @@ export default function RecordTimeline({ records, onClear }: RecordTimelineProps
                   {entries.map((entry) => (
                     <li key={entry.id} className="relative">
                       <span className="absolute -left-[1.65rem] top-1.5 h-3 w-3 rounded-full bg-emerald-300 ring-4 ring-emerald-50" />
-                      <p className="font-bold text-stone-700">{entry.taskName}</p>
+                      {entry.source ? (
+                        <button
+                          onClick={() => onRepeat(entry)}
+                          className="text-left font-bold text-stone-700 transition-colors hover:text-emerald-600"
+                        >
+                          {entry.taskName}
+                        </button>
+                      ) : (
+                        <p className="font-bold text-stone-700">{entry.taskName}</p>
+                      )}
                       <p className="text-xs text-stone-400">{formatTime(entry.completedAt)}</p>
                     </li>
                   ))}

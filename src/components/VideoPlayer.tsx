@@ -2,59 +2,37 @@
 
 import { useState } from "react";
 import { ArrowLeft, PlayCircle, RefreshCw, Search, SquarePen, Timer } from "lucide-react";
-import {
-  BODY_PART_OPTIONS,
-  DURATION_OPTIONS,
-  getRandomVideoByBodyPart,
-  getRandomVideoByDuration,
-} from "@/data/videos";
+import { BODY_PART_OPTIONS, DURATION_OPTIONS } from "@/data/videos";
 import { useEditableVideos } from "@/hooks/useEditableVideos";
+import { useVideoBoard } from "@/hooks/useVideoBoard";
 import VideoListEditor from "@/components/VideoListEditor";
-import { BodyPartKey, DurationKey, ExerciseVideo } from "@/types";
+import { RecordSource } from "@/types";
 
 interface VideoPlayerProps {
-  onComplete: (videoTitle: string) => void;
+  onComplete: (videoTitle: string, source?: RecordSource) => void;
 }
 
 type FilterMode = "duration" | "bodyPart";
 
 export default function VideoPlayer({ onComplete }: VideoPlayerProps) {
   const { videos, addVideo, updateVideo, removeVideo, resetVideos } = useEditableVideos();
+  const {
+    duration,
+    bodyPart,
+    video,
+    selectDuration: handleSelectDuration,
+    selectBodyPart: handleSelectBodyPart,
+    shuffle: handleShuffleVideo,
+    back: handleBack,
+  } = useVideoBoard(videos);
   const [filterMode, setFilterMode] = useState<FilterMode>("duration");
-  const [duration, setDuration] = useState<DurationKey | null>(null);
-  const [bodyPart, setBodyPart] = useState<BodyPartKey | null>(null);
-  const [video, setVideo] = useState<ExerciseVideo | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const isSelecting = !duration && !bodyPart;
 
-  function handleSelectDuration(key: DurationKey) {
-    setDuration(key);
-    setVideo(getRandomVideoByDuration(videos, key));
-  }
-
-  function handleSelectBodyPart(key: BodyPartKey) {
-    setBodyPart(key);
-    setVideo(getRandomVideoByBodyPart(videos, key));
-  }
-
-  function handleShuffleVideo() {
-    if (duration) {
-      setVideo((current) => getRandomVideoByDuration(videos, duration, current?.id));
-    } else if (bodyPart) {
-      setVideo((current) => getRandomVideoByBodyPart(videos, bodyPart, current?.id));
-    }
-  }
-
-  function handleBack() {
-    setDuration(null);
-    setBodyPart(null);
-    setVideo(null);
-  }
-
   function handleComplete() {
     if (!video) return;
-    onComplete(video.title);
+    onComplete(video.title, { type: "video", id: video.id });
     handleBack();
   }
 

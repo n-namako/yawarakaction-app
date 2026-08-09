@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
-import { RecordEntry } from "@/types";
+import { RecordEntry, RecordSource } from "@/types";
 
 const STORAGE_KEY = "yawarakaction-records";
 
@@ -56,12 +56,13 @@ function emitChange() {
 export function useLocalRecords() {
   const records = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  const addRecord = useCallback((taskName: string) => {
+  const addRecord = useCallback((taskName: string, source?: RecordSource) => {
     const next: RecordEntry[] = [
       {
         id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         taskName,
         completedAt: new Date().toISOString(),
+        ...(source ? { source } : {}),
       },
       ...readRecords(),
     ];

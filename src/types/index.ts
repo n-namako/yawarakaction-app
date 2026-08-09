@@ -24,10 +24,17 @@ export interface ExerciseVideo {
   bodyPart: BodyPartKey;
 }
 
+// 記録からの「もう一度やる」用：どのアクション/動画から生まれた記録かを覚えておく
+export interface RecordSource {
+  type: "task" | "video";
+  id: string;
+}
+
 export interface RecordEntry {
   id: string;
   taskName: string;
   completedAt: string; // ISO文字列
+  source?: RecordSource;
 }
 
 // 「もっとできちゃう」機能：急がないけど自分のためにいつかやりたいことのメモ
