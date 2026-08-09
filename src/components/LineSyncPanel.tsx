@@ -105,9 +105,14 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
 
   async function handleSendTest() {
     setTestState("sending");
+    setPushError(null);
     try {
       const res = await fetch("/api/notify-test", { method: "POST" });
+      const data = await res.json().catch(() => null);
       setTestState(res.ok ? "sent" : "error");
+      if (!res.ok && data?.error) {
+        setPushError(data.error);
+      }
     } catch {
       setTestState("error");
     } finally {

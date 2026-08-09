@@ -38,5 +38,21 @@ export async function POST() {
   );
 
   const sent = results.filter((r) => r.status === "fulfilled").length;
-  return NextResponse.json({ ok: sent > 0, sent, failed: results.length - sent });
+  const firstFailure = results.find(
+    (r): r is PromiseRejectedResult => r.status === "rejected"
+  );
+  if (firstFailure) {
+    console.error("Web Push送信に失敗しました", firstFailure.reason);
+  }
+
+  return NextResponse.json({
+    ok: sent > 0,
+    sent,
+    failed: results.length - sent,
+    error: firstFailure
+      ? firstFailure.reason instanceof Error
+        ? firstFailure.reason.message
+        : String(firstFailure.reason)
+      : undefined,
+  });
 }
