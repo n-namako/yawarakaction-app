@@ -65,7 +65,7 @@ export default function VideoPlayer({ onComplete }: VideoPlayerProps) {
     <section className="rounded-3xl bg-white/80 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] ring-1 ring-black/5 backdrop-blur-sm transition-all hover:shadow-[0_12px_36px_rgb(0,0,0,0.09)] sm:p-10">
       <div className="mb-5 flex items-center justify-center gap-2 text-sky-400">
         <Timer size={18} />
-        <p className="text-sm font-bold tracking-wide">からだを動かす動画エクササイズ</p>
+        <p className="text-sm font-bold tracking-wide">動画でからだを動かそう</p>
         <Timer size={18} />
         <button
           onClick={() => setIsEditorOpen(true)}

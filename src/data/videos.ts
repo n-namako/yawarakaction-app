@@ -10,6 +10,7 @@ export const BODY_PART_OPTIONS: { key: BodyPartKey; label: string; emoji: string
   { key: "shoulder", label: "肩・首", emoji: "🙆" },
   { key: "back", label: "腰・背中", emoji: "🧍" },
   { key: "hip", label: "股関節・お尻", emoji: "🍑" },
+  { key: "abdomen", label: "おなか", emoji: "🍥" },
   { key: "fullbody", label: "全身", emoji: "🔥" },
 ];
 
@@ -33,13 +34,6 @@ export const EXERCISE_VIDEOS: ExerciseVideo[] = [
     bodyPart: "back",
   },
   {
-    id: "v3",
-    title: "座ったまま全身シェイプ筋トレ",
-    youtubeId: "MyKtNBYl5_0",
-    duration: "5",
-    bodyPart: "fullbody",
-  },
-  {
     id: "v4",
     title: "座ったまま背中スッキリトレーニング",
     youtubeId: "fy6HF5UuA2c",
@@ -47,15 +41,8 @@ export const EXERCISE_VIDEOS: ExerciseVideo[] = [
     bodyPart: "back",
   },
   {
-    id: "v5",
-    title: "肩・首すっきりストレッチ",
-    youtubeId: "bY6NETUVKEU",
-    duration: "5",
-    bodyPart: "shoulder",
-  },
-  {
     id: "v6",
-    title: "滝汗ボクシングエクササイズ",
+    title: "滝汗ボクシング",
     youtubeId: "TSSpm8wp8ns",
     duration: "5",
     bodyPart: "fullbody",
@@ -87,6 +74,55 @@ export const EXERCISE_VIDEOS: ExerciseVideo[] = [
     youtubeId: "-Y5bOC_ecB0",
     duration: "10",
     bodyPart: "hip",
+  },
+  {
+    id: "v11",
+    title: "巻き肩リセットフォームローラー",
+    youtubeId: "vKAM1rR1yNw",
+    duration: "10",
+    bodyPart: "shoulder",
+  },
+  {
+    id: "v12",
+    title: "おなかすっきりエクササイズ",
+    youtubeId: "u7lslrolYPw",
+    duration: "5",
+    bodyPart: "abdomen",
+  },
+  {
+    id: "v13",
+    title: "お尻をフォームローラーでほぐす",
+    youtubeId: "asMUioK5jLo",
+    duration: "3",
+    bodyPart: "hip",
+  },
+  {
+    id: "v14",
+    title: "ストレートネック改善",
+    youtubeId: "ieql6lyRWIY",
+    duration: "10",
+    bodyPart: "shoulder",
+  },
+  {
+    id: "v15",
+    title: "ラジオ体操第一",
+    youtubeId: "re-PodR7_-c",
+    duration: "5",
+    bodyPart: "fullbody",
+  },
+  {
+    id: "v16",
+    title: "ぺたんこお腹エクササイズ",
+    youtubeId: "Hi3H66lWSnE",
+    duration: "3",
+    bodyPart: "abdomen",
+  },
+  {
+    id: "v17",
+    title: "全身しっかりエクササイズ",
+    youtubeId: "hge3fr50o0o",
+    duration: "10",
+    bodyPart: "fullbody",
   },
 ];
 

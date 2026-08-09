@@ -8,7 +8,7 @@ export interface ActionTask {
 export type DurationKey = "3" | "5" | "10";
 
 // 動画エクササイズ機能：時間だけでなく、対象の体の部位からも動画を選べるようにするための分類
-export type BodyPartKey = "shoulder" | "back" | "hip" | "fullbody";
+export type BodyPartKey = "shoulder" | "back" | "hip" | "abdomen" | "fullbody";
 
 export interface ExerciseVideo {
   id: string;
