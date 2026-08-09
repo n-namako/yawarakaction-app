@@ -17,22 +17,28 @@ export default function CloudSyncManager() {
 
     (async () => {
       try {
+        const local = readAllLocalData();
+        const localIsEmpty = !hasAnyCloudData(local);
+
         const res = await fetch("/api/sync");
         if (!res.ok) return;
         const { data } = await res.json();
+        const cloudHasData = hasAnyCloudData(data);
 
-        if (hasAnyCloudData(data)) {
-          // クラウドに既存データがある → それを正として端末側を上書き
+        if (localIsEmpty && cloudHasData) {
+          // このブラウザにはまだ何もない・クラウドには既存データがある
+          // → 新しい端末からのログインとみなし、クラウドの内容を取り込む（このケースだけ1回リロード）
           writeAllLocalData(data);
           window.location.reload();
-        } else {
+        } else if (!cloudHasData) {
           // クラウドが空 → 今このブラウザにあるデータを初回アップロード
           await fetch("/api/sync", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(readAllLocalData()),
+            body: JSON.stringify(local),
           });
         }
+        // 両方にデータがある場合は何もしない（以降は下の定期pushで同期される）
       } catch (error) {
         console.error("クラウド同期の初期化に失敗しました", error);
       }
