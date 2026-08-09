@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { HeartHandshake } from "lucide-react";
+import { HeartHandshake, Link2 } from "lucide-react";
 import TabNav, { TabKey } from "@/components/TabNav";
 import TaskCard from "@/components/TaskCard";
 import VideoPlayer from "@/components/VideoPlayer";
 import PraiseModal from "@/components/PraiseModal";
 import RecordTimeline from "@/components/RecordTimeline";
 import WishListModal from "@/components/WishListModal";
+import LineSyncPanel from "@/components/LineSyncPanel";
+import CloudSyncManager from "@/components/CloudSyncManager";
 import { useLocalRecords } from "@/hooks/useLocalRecords";
 import { getRandomMilestonePraise, getRandomPraise } from "@/data/praises";
 import { isMilestoneCount } from "@/lib/milestones";
@@ -21,6 +23,7 @@ export default function Home() {
   const [completedTaskName, setCompletedTaskName] = useState("");
   const [milestoneCount, setMilestoneCount] = useState<number | null>(null);
   const [isWishListOpen, setIsWishListOpen] = useState(false);
+  const [isLineSyncOpen, setIsLineSyncOpen] = useState(false);
 
   function handleComplete(taskName: string) {
     const newCount = records.length + 1;
@@ -71,10 +74,18 @@ export default function Home() {
         もっとできちゃう？（やりたいことリスト）
       </button>
 
-      <footer className="mt-6 text-center text-xs text-stone-300">
+      <footer className="mt-6 flex flex-col items-center gap-3 text-center text-xs text-stone-300">
         {records.length > 0
           ? `これまでに ${records.length} 回、がんばった自分を記録してきました 🌱`
           : "がんばりは、ぜんぶここに積み重なっていきます 🌱"}
+
+        <button
+          onClick={() => setIsLineSyncOpen(true)}
+          className="flex items-center gap-1.5 text-stone-300 underline-offset-4 transition-colors hover:text-emerald-500 hover:underline"
+        >
+          <Link2 size={14} />
+          LINEと連携する（データ保存・通知）
+        </button>
       </footer>
 
       <PraiseModal
@@ -90,6 +101,10 @@ export default function Home() {
         onClose={() => setIsWishListOpen(false)}
         onComplete={handleComplete}
       />
+
+      <LineSyncPanel isOpen={isLineSyncOpen} onClose={() => setIsLineSyncOpen(false)} />
+
+      <CloudSyncManager />
     </div>
   );
 }

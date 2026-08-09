@@ -1,0 +1,26 @@
+-- Supabaseの「SQL Editor」に貼り付けて実行してください。
+-- (プロジェクト作成後、左メニューの「SQL Editor」→「New query」)
+
+create table if not exists app_users (
+  line_user_id text primary key,
+  display_name text,
+  picture_url text,
+  notify_enabled boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists app_data (
+  line_user_id text primary key references app_users(line_user_id) on delete cascade,
+  tasks jsonb,
+  videos jsonb,
+  records jsonb,
+  wishlist jsonb,
+  updated_at timestamptz not null default now()
+);
+
+-- サーバーはservice_role_keyでアクセスするためRLS(Row Level Security)は無効のままでOKですが、
+-- 念のため明示的に有効化しておき、サーバー以外からの直接アクセスを防ぎます。
+alter table app_users enable row level security;
+alter table app_data enable row level security;
+-- ポリシーは意図的に作成しません（= anonキー等からは一切読み書きできない。
+-- サーバー側のservice_role_keyのみアクセス可能、という状態にしています）。
