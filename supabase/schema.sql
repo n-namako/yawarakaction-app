@@ -6,8 +6,13 @@ create table if not exists app_users (
   display_name text,
   picture_url text,
   notify_enabled boolean not null default true,
+  -- 通知を送る時刻のリスト。"HH:00"形式（日本時間）を複数持てる。例: ["09:00", "20:00"]
+  notify_times jsonb not null default '["09:00"]'::jsonb,
   created_at timestamptz not null default now()
 );
+
+-- 既存のテーブルに対しては、このカラム追加分だけ実行すればOK
+alter table app_users add column if not exists notify_times jsonb not null default '["09:00"]'::jsonb;
 
 create table if not exists app_data (
   line_user_id text primary key references app_users(line_user_id) on delete cascade,
