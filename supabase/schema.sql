@@ -23,9 +23,19 @@ create table if not exists app_data (
   updated_at timestamptz not null default now()
 );
 
+-- Web Push通知の購読情報（1ユーザーが複数端末を登録できるようendpointを主キーにする）
+create table if not exists push_subscriptions (
+  endpoint text primary key,
+  line_user_id text not null references app_users(line_user_id) on delete cascade,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz not null default now()
+);
+
 -- サーバーはservice_role_keyでアクセスするためRLS(Row Level Security)は無効のままでOKですが、
 -- 念のため明示的に有効化しておき、サーバー以外からの直接アクセスを防ぎます。
 alter table app_users enable row level security;
 alter table app_data enable row level security;
+alter table push_subscriptions enable row level security;
 -- ポリシーは意図的に作成しません（= anonキー等からは一切読み書きできない。
 -- サーバー側のservice_role_keyのみアクセス可能、という状態にしています）。

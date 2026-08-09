@@ -2,9 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { LogIn, LogOut, MessageCircle, Send, ShieldCheck } from "lucide-react";
+import { Bell, BellOff, LogIn, LogOut, Send, ShieldCheck } from "lucide-react";
 import Modal from "@/components/Modal";
 import { DEFAULT_NOTIFY_TIMES, NOTIFY_TIME_SLOTS, NotifyTimeSlot } from "@/lib/notifyTimes";
+import {
+  getExistingPushSubscription,
+  isPushSupported,
+  subscribeToPush,
+  unsubscribeFromPush,
+} from "@/lib/pushClient";
 
 interface LineSyncPanelProps {
   isOpen: boolean;
@@ -12,6 +18,7 @@ interface LineSyncPanelProps {
 }
 
 type TestState = "idle" | "sending" | "sent" | "error";
+type PushState = "checking" | "unsubscribed" | "subscribed" | "unsupported";
 
 export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
   const { data: session, status } = useSession();
@@ -19,6 +26,8 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
   const [notifyTimes, setNotifyTimes] = useState<NotifyTimeSlot[]>(DEFAULT_NOTIFY_TIMES);
   const [isSavingNotify, setIsSavingNotify] = useState(false);
   const [testState, setTestState] = useState<TestState>("idle");
+  const [pushState, setPushState] = useState<PushState>("checking");
+  const [pushError, setPushError] = useState<string | null>(null);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -32,6 +41,21 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
       })
       .catch(() => {});
   }, [status]);
+
+  useEffect(() => {
+    (async () => {
+      if (!isPushSupported()) {
+        setPushState("unsupported");
+        return;
+      }
+      try {
+        const sub = await getExistingPushSubscription();
+        setPushState(sub ? "subscribed" : "unsubscribed");
+      } catch {
+        setPushState("unsubscribed");
+      }
+    })();
+  }, [isOpen]);
 
   async function saveSettings(nextEnabled: boolean, nextTimes: NotifyTimeSlot[]) {
     setIsSavingNotify(true);
@@ -48,6 +72,23 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
     }
   }
 
+  async function handleEnablePush() {
+    setPushError(null);
+    try {
+      await subscribeToPush();
+      setPushState("subscribed");
+      setNotifyEnabled(true);
+      await saveSettings(true, notifyTimes);
+    } catch (error) {
+      setPushError(error instanceof Error ? error.message : "通知の許可に失敗しました");
+    }
+  }
+
+  async function handleDisablePush() {
+    await unsubscribeFromPush();
+    setPushState("unsubscribed");
+  }
+
   function handleToggleNotify() {
     const next = !notifyEnabled;
     setNotifyEnabled(next);
@@ -56,11 +97,8 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
 
   function handleToggleTime(slot: NotifyTimeSlot) {
     const isSelected = notifyTimes.includes(slot);
-    // 最低1つは選択された状態を保つ
     if (isSelected && notifyTimes.length === 1) return;
-    const next = isSelected
-      ? notifyTimes.filter((t) => t !== slot)
-      : [...notifyTimes, slot].sort();
+    const next = isSelected ? notifyTimes.filter((t) => t !== slot) : [...notifyTimes, slot].sort();
     setNotifyTimes(next);
     saveSettings(notifyEnabled, next);
   }
@@ -81,7 +119,7 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
     <Modal isOpen={isOpen} onClose={onClose} title="LINEと連携">
       <div className="flex flex-col gap-4">
         <p className="text-sm text-stone-400">
-          LINEでログインすると、記録やアクションのデータがブラウザのキャッシュを消しても消えなくなります。毎日のリマインドもLINEに届くようになります。
+          LINEでログインすると、記録やアクションのデータがブラウザのキャッシュを消しても消えなくなります。通知はLINEではなく、このブラウザ・端末に直接届く「プッシュ通知」でお知らせします。
         </p>
 
         {status === "authenticated" ? (
@@ -89,64 +127,96 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
             <div className="flex items-center gap-3 rounded-2xl bg-emerald-50 px-4 py-3">
               <ShieldCheck size={20} className="text-emerald-500" />
               <div>
-                <p className="text-xs font-bold text-emerald-500">連携中</p>
+                <p className="text-xs font-bold text-emerald-500">連携中（データ保存）</p>
                 <p className="font-bold text-stone-700">{session?.user?.name ?? "LINEユーザー"}</p>
               </div>
             </div>
 
-            <button
-              onClick={handleToggleNotify}
-              disabled={isSavingNotify}
-              className={`flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-bold transition-colors ${
-                notifyEnabled ? "bg-sky-50 text-sky-600" : "bg-stone-100 text-stone-400"
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <MessageCircle size={16} />
-                毎日のリマインド通知
-              </span>
-              <span>{notifyEnabled ? "ON" : "OFF"}</span>
-            </button>
-
-            {notifyEnabled && (
-              <div className="flex flex-col gap-2 rounded-2xl bg-stone-50 p-3">
-                <p className="text-xs font-bold text-stone-400">通知する時間帯（複数選択OK）</p>
-                <div className="flex flex-wrap gap-2">
-                  {NOTIFY_TIME_SLOTS.map((slot) => {
-                    const isSelected = notifyTimes.includes(slot);
-                    return (
-                      <button
-                        key={slot}
-                        onClick={() => handleToggleTime(slot)}
-                        disabled={isSavingNotify}
-                        className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
-                          isSelected
-                            ? "bg-sky-400 text-white"
-                            : "bg-white text-stone-400 ring-1 ring-stone-200"
-                        }`}
-                      >
-                        {slot}
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="text-[11px] text-stone-400">
-                  選んだ時間帯の数だけ、1日に届く回数が増えます（日本時間）
-                </p>
-              </div>
+            {pushState === "unsupported" && (
+              <p className="rounded-2xl bg-amber-50 px-4 py-3 text-xs text-amber-600">
+                このブラウザは通知に対応していません。iPhoneの場合は「ホーム画面に追加」してから、そのアイコンで開き直すと使えるようになります。
+              </p>
             )}
 
-            <button
-              onClick={handleSendTest}
-              disabled={testState === "sending"}
-              className="flex items-center justify-center gap-1.5 rounded-2xl bg-violet-100 px-4 py-3 text-sm font-bold text-violet-500 transition-colors hover:bg-violet-200"
-            >
-              <Send size={16} />
-              {testState === "idle" && "テスト通知を送る"}
-              {testState === "sending" && "送信中…"}
-              {testState === "sent" && "送信しました！LINEを確認してね ✅"}
-              {testState === "error" && "送信に失敗しました…"}
-            </button>
+            {pushState !== "unsupported" && pushState !== "checking" && (
+              <>
+                {pushState === "unsubscribed" ? (
+                  <button
+                    onClick={handleEnablePush}
+                    className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-sky-400 to-cyan-400 px-6 py-4 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
+                  >
+                    <Bell size={18} />
+                    この端末で通知を受け取る
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={handleToggleNotify}
+                      disabled={isSavingNotify}
+                      className={`flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-bold transition-colors ${
+                        notifyEnabled ? "bg-sky-50 text-sky-600" : "bg-stone-100 text-stone-400"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <Bell size={16} />
+                        毎日のリマインド通知
+                      </span>
+                      <span>{notifyEnabled ? "ON" : "OFF"}</span>
+                    </button>
+
+                    {notifyEnabled && (
+                      <div className="flex flex-col gap-2 rounded-2xl bg-stone-50 p-3">
+                        <p className="text-xs font-bold text-stone-400">通知する時間帯（複数選択OK）</p>
+                        <div className="flex flex-wrap gap-2">
+                          {NOTIFY_TIME_SLOTS.map((slot) => {
+                            const isSelected = notifyTimes.includes(slot);
+                            return (
+                              <button
+                                key={slot}
+                                onClick={() => handleToggleTime(slot)}
+                                disabled={isSavingNotify}
+                                className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
+                                  isSelected
+                                    ? "bg-sky-400 text-white"
+                                    : "bg-white text-stone-400 ring-1 ring-stone-200"
+                                }`}
+                              >
+                                {slot}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="text-[11px] text-stone-400">
+                          選んだ時間帯の数だけ、1日に届く回数が増えます（日本時間）
+                        </p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={handleSendTest}
+                      disabled={testState === "sending"}
+                      className="flex items-center justify-center gap-1.5 rounded-2xl bg-violet-100 px-4 py-3 text-sm font-bold text-violet-500 transition-colors hover:bg-violet-200"
+                    >
+                      <Send size={16} />
+                      {testState === "idle" && "テスト通知を送る"}
+                      {testState === "sending" && "送信中…"}
+                      {testState === "sent" && "送信しました！通知を確認してね ✅"}
+                      {testState === "error" && "送信に失敗しました…"}
+                    </button>
+
+                    <button
+                      onClick={handleDisablePush}
+                      className="flex items-center justify-center gap-1.5 rounded-2xl bg-stone-100 px-4 py-3 text-xs font-bold text-stone-400 transition-colors hover:bg-stone-200"
+                    >
+                      <BellOff size={14} />
+                      この端末の通知をやめる
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+
+            {pushError && <p className="text-xs text-rose-400">{pushError}</p>}
 
             <button
               onClick={() => signOut()}
