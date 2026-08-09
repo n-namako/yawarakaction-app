@@ -12,6 +12,7 @@ export const PRAISE_MESSAGES: string[] = [
   "続けてるだけで才能！",
   "今日のあなたは合格！",
   "小さな一歩、大きな価値！",
+  "今日も、ここまでのあなたで十分えらい！",
 ];
 
 export function getRandomPraise(): string {

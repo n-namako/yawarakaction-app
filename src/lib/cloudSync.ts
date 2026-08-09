@@ -1,10 +1,10 @@
 "use client";
 
 const KEYS = {
-  tasks: "jikoteikan-tasks",
-  videos: "jikoteikan-videos",
-  records: "jikoteikan-records",
-  wishlist: "jikoteikan-wishlist",
+  tasks: "yawarakaction-tasks",
+  videos: "yawarakaction-videos",
+  records: "yawarakaction-records",
+  wishlist: "yawarakaction-wishlist",
 } as const;
 
 export interface CloudData {

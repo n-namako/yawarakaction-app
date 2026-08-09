@@ -49,13 +49,16 @@ export default function TaskCard({ onComplete }: TaskCardProps) {
             </span>
           </div>
 
-          {timerSeconds !== null && (
-            <div className="mt-6 flex justify-center">
+          {/* タイマーの有無で高さが変わり「できた！」ボタンの位置がアクションごとにブレないよう、常に同じ高さを確保しておく */}
+          <div className="mt-[18px] flex min-h-[112px] flex-col items-center justify-center">
+            {timerSeconds !== null ? (
               <TaskTimer key={currentTask.id} totalSeconds={timerSeconds} />
-            </div>
-          )}
+            ) : (
+              <p className="text-sm text-stone-400">回数を目安に、無理なくやってみてね</p>
+            )}
+          </div>
 
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <div className="mt-[20px] flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <button
               onClick={handleComplete}
               className="w-full rounded-2xl bg-gradient-to-br from-rose-300 to-orange-300 px-8 py-4 text-lg font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-sm sm:w-auto"

@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+
 interface ConfirmDialogProps {
   isOpen: boolean;
   title: string;
@@ -12,6 +15,7 @@ interface ConfirmDialogProps {
 
 // 「デフォルトに戻す」など、取り消せない操作の前に挟む確認モーダル
 // (window.confirm()だと見た目がアプリのトーンから外れるため、専用デザインにしている)
+// カード側のbackdrop-blurなどの影響を受けないよう、document.body直下にポータルで描画する
 export default function ConfirmDialog({
   isOpen,
   title,
@@ -21,9 +25,15 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
 
-  return (
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-stone-900/50 p-4 backdrop-blur-[2px]"
       onClick={onCancel}
@@ -50,6 +60,7 @@ export default function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

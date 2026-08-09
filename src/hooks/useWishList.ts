@@ -4,7 +4,7 @@ import { useCallback, useSyncExternalStore } from "react";
 import { WishItem } from "@/types";
 import { generateId } from "@/lib/id";
 
-const STORAGE_KEY = "jikoteikan-wishlist";
+const STORAGE_KEY = "yawarakaction-wishlist";
 const EMPTY_LIST: WishItem[] = [];
 
 function readList(): WishItem[] {

@@ -4,7 +4,7 @@ import { useCallback, useSyncExternalStore } from "react";
 import { EXERCISE_VIDEOS } from "@/data/videos";
 import { ExerciseVideo } from "@/types";
 
-const STORAGE_KEY = "jikoteikan-videos";
+const STORAGE_KEY = "yawarakaction-videos";
 
 function readVideos(): ExerciseVideo[] {
   try {

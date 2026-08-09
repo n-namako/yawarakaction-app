@@ -97,28 +97,30 @@ export default function TaskListEditor({
           {tasks.map((task) =>
             editingId === task.id ? (
               <div key={task.id} className="flex flex-col gap-2 rounded-2xl bg-amber-50 p-3">
-                <div className="flex gap-2">
-                  <input
-                    value={editDraft.emoji}
-                    onChange={(e) => setEditDraft((d) => ({ ...d, emoji: e.target.value }))}
-                    className="w-14 rounded-xl border border-stone-200 px-2 py-2 text-center text-lg"
-                    maxLength={4}
-                    aria-label="アイコン"
-                  />
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <input
                     value={editDraft.title}
                     onChange={(e) => setEditDraft((d) => ({ ...d, title: e.target.value }))}
-                    className="flex-1 rounded-xl border border-stone-200 px-3 py-2 text-sm"
+                    className="min-w-0 rounded-xl border border-stone-200 px-3 py-2 text-sm sm:order-2 sm:flex-1"
                     placeholder="アクション名"
                     aria-label="アクション名"
                   />
-                  <input
-                    value={editDraft.duration}
-                    onChange={(e) => setEditDraft((d) => ({ ...d, duration: e.target.value }))}
-                    className="w-20 rounded-xl border border-stone-200 px-2 py-2 text-sm"
-                    placeholder="3分"
-                    aria-label="所要時間"
-                  />
+                  <div className="flex gap-2 sm:order-1 sm:contents">
+                    <input
+                      value={editDraft.emoji}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, emoji: e.target.value }))}
+                      className="w-14 shrink-0 rounded-xl border border-stone-200 px-2 py-2 text-center text-lg sm:order-1"
+                      maxLength={4}
+                      aria-label="アイコン"
+                    />
+                    <input
+                      value={editDraft.duration}
+                      onChange={(e) => setEditDraft((d) => ({ ...d, duration: e.target.value }))}
+                      className="w-20 shrink-0 rounded-xl border border-stone-200 px-2 py-2 text-sm sm:order-3"
+                      placeholder="3分"
+                      aria-label="所要時間"
+                    />
+                  </div>
                 </div>
                 <div className="flex justify-end gap-2">
                   <button
@@ -164,29 +166,31 @@ export default function TaskListEditor({
 
           <div className="mt-2 flex flex-col gap-2 rounded-2xl border-2 border-dashed border-stone-200 p-3">
             <p className="text-xs font-bold text-stone-400">新しいアクションを追加</p>
-            <div className="flex gap-2">
-              <input
-                value={newDraft.emoji}
-                onChange={(e) => setNewDraft((d) => ({ ...d, emoji: e.target.value }))}
-                className="w-14 rounded-xl border border-stone-200 px-2 py-2 text-center text-lg"
-                placeholder="⭐"
-                maxLength={4}
-                aria-label="アイコン"
-              />
+            <div className="flex flex-col gap-2 sm:flex-row">
               <input
                 value={newDraft.title}
                 onChange={(e) => setNewDraft((d) => ({ ...d, title: e.target.value }))}
-                className="flex-1 rounded-xl border border-stone-200 px-3 py-2 text-sm"
+                className="min-w-0 rounded-xl border border-stone-200 px-3 py-2 text-sm sm:order-2 sm:flex-1"
                 placeholder="アクション名（例：水を飲む）"
                 aria-label="アクション名"
               />
-              <input
-                value={newDraft.duration}
-                onChange={(e) => setNewDraft((d) => ({ ...d, duration: e.target.value }))}
-                className="w-20 rounded-xl border border-stone-200 px-2 py-2 text-sm"
-                placeholder="1分"
-                aria-label="所要時間"
-              />
+              <div className="flex gap-2 sm:order-1 sm:contents">
+                <input
+                  value={newDraft.emoji}
+                  onChange={(e) => setNewDraft((d) => ({ ...d, emoji: e.target.value }))}
+                  className="w-14 shrink-0 rounded-xl border border-stone-200 px-2 py-2 text-center text-lg sm:order-1"
+                  placeholder="⭐"
+                  maxLength={4}
+                  aria-label="アイコン"
+                />
+                <input
+                  value={newDraft.duration}
+                  onChange={(e) => setNewDraft((d) => ({ ...d, duration: e.target.value }))}
+                  className="w-20 shrink-0 rounded-xl border border-stone-200 px-2 py-2 text-sm sm:order-3"
+                  placeholder="1分"
+                  aria-label="所要時間"
+                />
+              </div>
             </div>
             <button
               onClick={handleAdd}

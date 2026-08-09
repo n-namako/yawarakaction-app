@@ -3,7 +3,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { RecordEntry } from "@/types";
 
-const STORAGE_KEY = "jikoteikan-records";
+const STORAGE_KEY = "yawarakaction-records";
 
 function readRecords(): RecordEntry[] {
   try {

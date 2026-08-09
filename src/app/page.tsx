@@ -39,13 +39,12 @@ export default function Home() {
   return (
     <div className="flex flex-1 flex-col items-center px-4 py-10 sm:py-16">
       <header className="mb-8 flex flex-col items-center gap-2 text-center">
-        <div className="flex items-center gap-2 text-rose-400">
-          <HeartHandshake size={22} />
-          <span className="text-sm font-bold tracking-wide">やわらかアクション（仮）</span>
+        <div className="flex items-center gap-2">
+          <HeartHandshake size={24} className="text-rose-400" />
+          <h1 className="text-lg font-extrabold tracking-wide text-stone-700 sm:text-xl">
+            やわらかアクション（仮）
+          </h1>
         </div>
-        <h1 className="text-2xl font-extrabold text-stone-700 sm:text-3xl">
-          今日も、ここまでのあなたで十分えらい
-        </h1>
         <p className="text-sm text-stone-400">
           小さな一歩を選んで、思いきり自分を褒めてあげよう
         </p>

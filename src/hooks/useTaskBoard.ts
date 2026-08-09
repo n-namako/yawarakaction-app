@@ -4,7 +4,7 @@ import { useCallback, useSyncExternalStore } from "react";
 import { ACTION_TASKS, getRandomTask } from "@/data/tasks";
 import { ActionTask } from "@/types";
 
-const STORAGE_KEY = "jikoteikan-tasks";
+const STORAGE_KEY = "yawarakaction-tasks";
 
 interface TaskBoardState {
   tasks: ActionTask[];
