@@ -63,26 +63,14 @@
 
 ## 4. 現在の作業状況とNext Step
 
-**現在唯一残っている既知の不具合**：
+**既知の不具合はすべて解消済みです。** 直近のセッションで以下を修正し、GitHub Actions経由の毎時リマインドが `200` 成功することを確認済みです：
+1. `app_users.notify_times` カラムが未作成だった → `alter table` で追加
+2. Supabase `.contains()` にJS配列をそのまま渡すと、jsonbカラムに対して不正な形式（Postgres配列リテラル）でシリアライズされてしまっていた → `JSON.stringify()` で明示的にJSON文字列として渡すよう修正
 
-> `app_users` テーブルに **`notify_times` カラムが実際には追加されていない**ため、
-> - 毎時の自動リマインド（GitHub Actions → `/api/cron/daily-reminder`）が **500エラー**で失敗し続けている
-> - （おそらく）通知時間帯の設定保存（`/api/notify-settings`）も同じ理由で正しく保存できていない可能性がある
+### 現時点でNext Stepと呼べる具体タスクはなし
+一通りの基盤（デプロイ・LINEログイン・クラウド同期・Web Push通知・毎時リマインド）が完成し、動作確認も取れている状態です。次のチャットは、新機能追加やUI改善など、ユーザーからの新しい要望を聞くところから始めてください。
 
-### すぐ実行すべきタスク
-1. **ユーザーに、SupabaseのSQL Editorで以下を実行してもらう**（これは伝え済み、ユーザーからの実行完了報告待ち）：
-   ```sql
-   alter table app_users add column if not exists notify_times jsonb not null default '["09:00"]'::jsonb;
-   ```
-2. 実行後、GitHub Actionsを再度手動実行して確認：
-   ```bash
-   gh workflow run hourly-reminder.yml
-   ```
-3. 数十秒待ってから結果を確認：
-   ```bash
-   gh run list --workflow=hourly-reminder.yml --limit 1
-   ```
-4. 成功したら、実際に通知時間帯（LINEと連携パネル内）を変更・保存できるかもUIから再確認する
+ただし、**まだ実機での「決まった時間に本当に通知が届くか」の自然な実地確認は済んでいません**（GitHub Actionsからの手動トリガーでの成功確認のみ）。次にユーザーと話す際、「時間になったらちゃんと通知来てる？」と一声聞いてみるとよいです。
 
 ### 運用上の既知の癖（ハマりポイント）
 - **`vercel --prod` や `vercel redeploy` を実行すると、なぜか毎回 `jikoteikan-app.vercel.app`（旧プロジェクト名のドメイン）にエイリアスされてしまう。** デプロイのたびに以下で本来のドメインに貼り直すこと：
