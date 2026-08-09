@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Cloud, HeartHandshake } from "lucide-react";
 import TabNav, { TabKey } from "@/components/TabNav";
 import TaskCard from "@/components/TaskCard";
@@ -24,6 +24,19 @@ export default function Home() {
   const [milestoneCount, setMilestoneCount] = useState<number | null>(null);
   const [isWishListOpen, setIsWishListOpen] = useState(false);
   const [isLineSyncOpen, setIsLineSyncOpen] = useState(false);
+  const [justLinked, setJustLinked] = useState(false);
+
+  // LINEログインから戻ってきたときは、データ保存・通知のポップアップを開いた状態にする
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("linked") === "1") {
+      setIsLineSyncOpen(true);
+      setJustLinked(true);
+      params.delete("linked");
+      const rest = params.toString();
+      window.history.replaceState(null, "", window.location.pathname + (rest ? `?${rest}` : ""));
+    }
+  }, []);
 
   function handleComplete(taskName: string) {
     const newCount = records.length + 1;
@@ -101,7 +114,14 @@ export default function Home() {
         onComplete={handleComplete}
       />
 
-      <LineSyncPanel isOpen={isLineSyncOpen} onClose={() => setIsLineSyncOpen(false)} />
+      <LineSyncPanel
+        isOpen={isLineSyncOpen}
+        onClose={() => {
+          setIsLineSyncOpen(false);
+          setJustLinked(false);
+        }}
+        justLinked={justLinked}
+      />
 
       <CloudSyncManager />
     </div>

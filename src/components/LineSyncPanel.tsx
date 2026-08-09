@@ -15,12 +15,13 @@ import {
 interface LineSyncPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  justLinked?: boolean;
 }
 
 type TestState = "idle" | "sending" | "sent" | "error";
 type PushState = "checking" | "unsubscribed" | "subscribed" | "unsupported";
 
-export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
+export default function LineSyncPanel({ isOpen, onClose, justLinked = false }: LineSyncPanelProps) {
   const { data: session, status } = useSession();
   const [notifyEnabled, setNotifyEnabled] = useState(true);
   const [notifyTimes, setNotifyTimes] = useState<NotifyTimeSlot[]>(DEFAULT_NOTIFY_TIMES);
@@ -28,6 +29,17 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
   const [testState, setTestState] = useState<TestState>("idle");
   const [pushState, setPushState] = useState<PushState>("checking");
   const [pushError, setPushError] = useState<string | null>(null);
+  const [justUnlinked, setJustUnlinked] = useState(false);
+
+  // モーダルを開き直したら「解除しました」表示はリセットする
+  useEffect(() => {
+    if (isOpen) setJustUnlinked(false);
+  }, [isOpen]);
+
+  async function handleSignOut() {
+    await signOut({ redirect: false });
+    setJustUnlinked(true);
+  }
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -129,6 +141,12 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
 
         {status === "authenticated" ? (
           <div className="flex flex-col gap-3">
+            {justLinked && (
+              <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-center text-sm font-bold text-emerald-600">
+                🎉 連携しました！これでデータが消えなくなります。
+              </p>
+            )}
+
             <div className="flex items-center gap-3 rounded-2xl bg-emerald-50 px-4 py-3">
               <ShieldCheck size={20} className="text-emerald-500" />
               <div>
@@ -224,7 +242,7 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
             {pushError && <p className="text-xs text-rose-400">{pushError}</p>}
 
             <button
-              onClick={() => signOut()}
+              onClick={handleSignOut}
               className="flex items-center justify-center gap-1.5 rounded-2xl bg-stone-100 px-4 py-3 text-sm font-bold text-stone-500 transition-colors hover:bg-stone-200"
             >
               <LogOut size={16} />
@@ -232,13 +250,20 @@ export default function LineSyncPanel({ isOpen, onClose }: LineSyncPanelProps) {
             </button>
           </div>
         ) : (
-          <button
-            onClick={() => signIn("line")}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-400 px-6 py-4 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
-          >
-            <LogIn size={18} />
-            LINEでログインする
-          </button>
+          <div className="flex flex-col gap-3">
+            {justUnlinked && (
+              <p className="rounded-2xl bg-stone-50 px-4 py-3 text-xs text-stone-500">
+                解除しました。データはクラウドに残っているので、再度LINEでログインすればすぐに元通りになります。
+              </p>
+            )}
+            <button
+              onClick={() => signIn("line", { callbackUrl: "/?linked=1" })}
+              className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-400 px-6 py-4 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
+            >
+              <LogIn size={18} />
+              LINEでログインする
+            </button>
+          </div>
         )}
       </div>
     </Modal>

@@ -66,25 +66,28 @@ export default function WishListModal({ isOpen, onClose, onComplete }: WishListM
           )}
         </div>
 
-        <div className="flex gap-2 rounded-2xl border-2 border-dashed border-stone-200 p-3">
-          <input
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleAdd();
-            }}
-            placeholder="やりたいことを書く（例：話題の映画を観る）"
-            className="min-w-0 flex-1 rounded-xl border border-stone-200 px-3 py-2 text-sm"
-            aria-label="やりたいこと"
-          />
-          <button
-            onClick={handleAdd}
-            disabled={!draft.trim()}
-            className="flex shrink-0 items-center gap-1 rounded-2xl bg-violet-300 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-violet-400 disabled:cursor-not-allowed disabled:bg-stone-200 disabled:text-stone-400"
-          >
-            <Plus size={16} />
-            追加
-          </button>
+        <div className="flex flex-col gap-2 rounded-2xl border-2 border-dashed border-stone-200 p-3">
+          <p className="text-xs font-bold text-stone-400">新しいやりたいことを追加</p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleAdd();
+              }}
+              placeholder="例：映画を観る"
+              className="min-w-0 rounded-xl border border-stone-200 px-3 py-2 text-sm sm:flex-1"
+              aria-label="やりたいこと"
+            />
+            <button
+              onClick={handleAdd}
+              disabled={!draft.trim()}
+              className="flex shrink-0 items-center justify-center gap-1 rounded-2xl bg-violet-300 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-violet-400 disabled:cursor-not-allowed disabled:bg-stone-200 disabled:text-stone-400"
+            >
+              <Plus size={16} />
+              追加
+            </button>
+          </div>
         </div>
 
         {items.length > 0 && (
