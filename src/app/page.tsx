@@ -98,7 +98,7 @@ export default function Home() {
           </h1>
         </div>
         <p className="text-sm text-stone-400">
-          小さな一歩を選んで、思いきり自分を褒めてあげよう
+          自分にやさしく、小さな一歩を
         </p>
       </header>
 
