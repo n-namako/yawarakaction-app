@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { formatSeconds } from "@/lib/duration";
 import { playChime, primeAudio } from "@/lib/chime";
@@ -16,13 +16,35 @@ export default function TaskTimer({ totalSeconds }: TaskTimerProps) {
   const [remaining, setRemaining] = useState(totalSeconds);
   const [isRunning, setIsRunning] = useState(false);
   const isFinished = remaining <= 0;
+  // 画面ロック中はsetIntervalが止まってしまうため、tick数を数えるのではなく
+  // 「終了予定の時刻」を覚えておいて、そこからの残り時間を計算し直す方式にしている
+  const endTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!isRunning || isFinished) return;
-    const intervalId = setInterval(() => {
-      setRemaining((prev) => Math.max(prev - 1, 0));
-    }, 1000);
-    return () => clearInterval(intervalId);
+
+    endTimeRef.current = Date.now() + remaining * 1000;
+
+    function syncRemaining() {
+      if (endTimeRef.current === null) return;
+      const next = Math.max(0, Math.ceil((endTimeRef.current - Date.now()) / 1000));
+      setRemaining(next);
+    }
+
+    const intervalId = setInterval(syncRemaining, 1000);
+
+    // 画面が復帰した瞬間（スリープ解除・タブ切り替えから戻った時）にも、
+    // 次のtickを待たずすぐ正しい残り時間に補正する
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") syncRemaining();
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRunning, isFinished]);
 
   // タイマーが0になった瞬間に一度だけチャイムを鳴らす

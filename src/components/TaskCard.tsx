@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { RefreshCw, Sparkles, SquarePen } from "lucide-react";
 import { useTaskBoard } from "@/hooks/useTaskBoard";
 import TaskListEditor from "@/components/TaskListEditor";
@@ -12,10 +12,14 @@ interface TaskCardProps {
   onComplete: (taskName: string, source?: RecordSource) => void;
 }
 
+// 横スワイプと判定する最小距離(px)。指の震え程度では反応しないよう、ある程度余裕を持たせている
+const SWIPE_THRESHOLD = 60;
+
 export default function TaskCard({ onComplete }: TaskCardProps) {
   const { tasks, currentTask, shuffle, addTask, updateTask, removeTask, resetTasks } = useTaskBoard();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const timerSeconds = currentTask ? parseDurationToSeconds(currentTask.duration) : null;
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
 
   function handleComplete() {
     if (!currentTask) return;
@@ -23,8 +27,30 @@ export default function TaskCard({ onComplete }: TaskCardProps) {
     shuffle();
   }
 
+  // 「べつのアクションにする」ボタンと同じ操作を、左右スワイプでもできるようにする
+  function handlePointerDown(e: React.PointerEvent) {
+    swipeStartRef.current = { x: e.clientX, y: e.clientY };
+  }
+
+  function handlePointerUp(e: React.PointerEvent) {
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!start || !currentTask) return;
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      shuffle();
+    }
+  }
+
   return (
-    <section className="rounded-3xl bg-white/80 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] ring-1 ring-black/5 backdrop-blur-sm transition-all hover:shadow-[0_12px_36px_rgb(0,0,0,0.09)] sm:p-10">
+    <section
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={() => {
+        swipeStartRef.current = null;
+      }}
+      className="rounded-3xl bg-white/80 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] ring-1 ring-black/5 backdrop-blur-sm transition-all hover:shadow-[0_12px_36px_rgb(0,0,0,0.09)] sm:p-10">
       <div className="mb-5 flex items-center justify-center gap-2 text-rose-400">
         <Sparkles size={18} />
         <p className="text-sm font-bold tracking-wide">今すぐできること、ひとつだけ</p>
