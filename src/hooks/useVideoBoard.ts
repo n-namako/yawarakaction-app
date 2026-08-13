@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
-import { getRandomVideoByBodyPart, getRandomVideoByDuration } from "@/data/videos";
+import { getRandomVideo, getRandomVideoByBodyPart, getRandomVideoByDuration } from "@/data/videos";
 import { BodyPartKey, DurationKey, ExerciseVideo } from "@/types";
 
 interface VideoBoardState {
@@ -66,12 +66,22 @@ export function useVideoBoard(videos: ExerciseVideo[]) {
     } else if (state.bodyPart) {
       const picked = getRandomVideoByBodyPart(videos, state.bodyPart, state.videoId ?? undefined);
       setState({ ...state, videoId: picked?.id ?? null });
+    } else {
+      // 時間・部位どちらも絞り込んでいない（おまかせ）状態でのシャッフル
+      const picked = getRandomVideo(videos, state.videoId ?? undefined);
+      setState({ ...state, videoId: picked?.id ?? null });
     }
   }, [videos]);
 
   const back = useCallback(() => {
     setState(INITIAL_STATE);
   }, []);
+
+  // 絞り込みなし（おまかせ）で、リスト全体からランダムに1件選び直す
+  const selectRandom = useCallback(() => {
+    const picked = getRandomVideo(videos, state.videoId ?? undefined);
+    setState({ duration: null, bodyPart: null, videoId: picked?.id ?? null });
+  }, [videos]);
 
   // きろく画面の「もう一度やる」から、特定の動画を表示中にする。存在しなければfalseを返す
   const selectVideoById = useCallback(
@@ -84,5 +94,15 @@ export function useVideoBoard(videos: ExerciseVideo[]) {
     [videos]
   );
 
-  return { duration, bodyPart, video, selectDuration, selectBodyPart, shuffle, back, selectVideoById };
+  return {
+    duration,
+    bodyPart,
+    video,
+    selectDuration,
+    selectBodyPart,
+    shuffle,
+    back,
+    selectRandom,
+    selectVideoById,
+  };
 }

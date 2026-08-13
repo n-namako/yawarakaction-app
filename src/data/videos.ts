@@ -133,6 +133,11 @@ function pickRandom(candidates: ExerciseVideo[], excludeId?: string): ExerciseVi
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
+// 絞り込みなし（時間も部位も指定しない）で、リスト全体からランダムに1件選ぶ
+export function getRandomVideo(videos: ExerciseVideo[], excludeId?: string): ExerciseVideo | null {
+  return pickRandom(videos, excludeId);
+}
+
 export function getRandomVideoByDuration(
   videos: ExerciseVideo[],
   duration: DurationKey,
