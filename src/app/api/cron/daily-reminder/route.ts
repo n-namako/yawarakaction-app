@@ -77,7 +77,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: subsError.message }, { status: 500 });
   }
 
-  const message = { title: "やわらかアクション（仮）", body: getRandomReminderMessage() };
+  const message = { title: "やわらかアクション v1.0", body: getRandomReminderMessage() };
 
   const results = await Promise.allSettled(
     (subs ?? []).map(async (sub) => {

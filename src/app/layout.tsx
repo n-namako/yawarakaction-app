@@ -10,7 +10,7 @@ const mplusRounded = M_PLUS_Rounded_1c({
 });
 
 export const metadata: Metadata = {
-  title: "やわらかアクション（仮）",
+  title: "やわらかアクション v1.0",
   description: "自己肯定感が上がる専用Webアプリ。小さな一歩を、思いきり褒めよう。",
 };
 

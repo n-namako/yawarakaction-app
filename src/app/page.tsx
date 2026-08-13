@@ -94,7 +94,7 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <HeartHandshake size={24} className="text-rose-400" />
           <h1 className="text-lg font-extrabold tracking-wide text-stone-700 sm:text-xl">
-            やわらかアクション（仮）
+            やわらかアクション v1.0
           </h1>
         </div>
         <p className="text-sm text-stone-400">

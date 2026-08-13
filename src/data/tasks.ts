@@ -6,7 +6,6 @@ import { ActionTask } from "@/types";
 export const ACTION_TASKS: ActionTask[] = [
   { id: "desk", title: "部屋の掃除", duration: "3分", emoji: "🧹" },
   { id: "squat", title: "スクワット", duration: "5回", emoji: "🏋️" },
-  { id: "pet", title: "いぬと遊ぶ", duration: "3分", emoji: "🐶" },
   { id: "breath", title: "深呼吸", duration: "30秒", emoji: "🌬️" },
 ];
 
