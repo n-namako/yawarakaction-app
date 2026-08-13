@@ -2,9 +2,12 @@ name: Hourly reminder trigger
 
 on:
   schedule:
-    # 毎時0分（UTC）に実行。Vercel Hobbyプランのcron制限（1日1回まで）を回避するため、
+    # 毎時7分（UTC）に実行。Vercel Hobbyプランのcron制限（1日1回まで）を回避するため、
     # GitHub Actionsから直接エンドポイントを叩く。
-    - cron: "0 * * * *"
+    # 毎時0分ちょうどはGitHub Actions側が混雑して遅延しやすいため、あえて7分にずらしている。
+    # なお/api/cron/daily-reminder側は「前回通知してから今までの間に来るべきだった時間帯」を
+    # 拾うキャッチアップ処理をしているので、多少の遅延があっても通知の取りこぼしは防げる。
+    - cron: "7 * * * *"
   workflow_dispatch: {}
 
 jobs:
