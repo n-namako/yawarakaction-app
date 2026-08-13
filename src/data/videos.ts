@@ -42,7 +42,7 @@ export const EXERCISE_VIDEOS: ExerciseVideo[] = [
   },
   {
     id: "v6",
-    title: "滝汗ボクシング",
+    title: "4分滝汗ボクシング",
     youtubeId: "TSSpm8wp8ns",
     duration: "5",
     bodyPart: "fullbody",
@@ -56,7 +56,7 @@ export const EXERCISE_VIDEOS: ExerciseVideo[] = [
   },
   {
     id: "v8",
-    title: "パンチ＆キックでストレス発散",
+    title: "10分滝汗ボクシング",
     youtubeId: "g7KSIpPAAj4",
     duration: "10",
     bodyPart: "fullbody",
@@ -84,7 +84,7 @@ export const EXERCISE_VIDEOS: ExerciseVideo[] = [
   },
   {
     id: "v12",
-    title: "おなかすっきりエクササイズ",
+    title: "立ち腹筋で下腹痩せ",
     youtubeId: "u7lslrolYPw",
     duration: "5",
     bodyPart: "abdomen",
@@ -112,14 +112,14 @@ export const EXERCISE_VIDEOS: ExerciseVideo[] = [
   },
   {
     id: "v16",
-    title: "ぺたんこお腹エクササイズ",
+    title: "やさしい腹筋トレーニング",
     youtubeId: "Hi3H66lWSnE",
     duration: "3",
     bodyPart: "abdomen",
   },
   {
     id: "v17",
-    title: "全身しっかりエクササイズ",
+    title: "世界で一番楽な筋トレ＆有酸素運動",
     youtubeId: "hge3fr50o0o",
     duration: "10",
     bodyPart: "fullbody",
